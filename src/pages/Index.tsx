@@ -1,7 +1,9 @@
+
 import { useState } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Phone, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { FilterSidebar } from "@/components/FilterSidebar";
 import { CollegeCard } from "@/components/CollegeCard";
 
