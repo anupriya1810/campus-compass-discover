@@ -3,13 +3,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { CalendarIcon, User, Mail, Phone, MapPin, Building } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { User, Mail, Phone, MapPin, Building, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ApplicationFormProps {
@@ -35,7 +31,7 @@ export const ApplicationForm = ({ isOpen, onClose, collegeName }: ApplicationFor
     name: "",
     email: "",
     contact: "",
-    dateOfBirth: undefined as Date | undefined,
+    dateOfBirth: "",
     city: "",
     state: ""
   });
@@ -77,7 +73,7 @@ export const ApplicationForm = ({ isOpen, onClose, collegeName }: ApplicationFor
         name: "",
         email: "",
         contact: "",
-        dateOfBirth: undefined,
+        dateOfBirth: "",
         city: "",
         state: ""
       });
@@ -151,34 +147,17 @@ export const ApplicationForm = ({ isOpen, onClose, collegeName }: ApplicationFor
           </div>
 
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4" />
+            <Label htmlFor="dateOfBirth" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
               Date of Birth *
             </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formData.dateOfBirth && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formData.dateOfBirth ? format(formData.dateOfBirth, "PPP") : "Select date of birth"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={formData.dateOfBirth}
-                  onSelect={(date) => setFormData({ ...formData, dateOfBirth: date })}
-                  disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
+            <Input
+              id="dateOfBirth"
+              type="date"
+              value={formData.dateOfBirth}
+              onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+              required
+            />
           </div>
 
           <div className="space-y-2">
