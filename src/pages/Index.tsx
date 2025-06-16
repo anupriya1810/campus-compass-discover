@@ -1,15 +1,9 @@
-
 import { useState } from "react";
-import { Search, Filter, MapPin, Star, DollarSign, Users, Calendar, Award, Phone, Mail, Globe } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import { FilterSidebar } from "@/components/FilterSidebar";
+import { CollegeCard } from "@/components/CollegeCard";
 
 // Mock college data
 const colleges = [
@@ -90,7 +84,7 @@ const Index = () => {
   const [selectedCourse, setSelectedCourse] = useState("all");
   const [feeRange, setFeeRange] = useState([0, 100000]);
   const [minRating, setMinRating] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const filteredColleges = colleges.filter(college => {
     const matchesSearch = college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -104,38 +98,45 @@ const Index = () => {
     return matchesSearch && matchesLocation && matchesCourse && matchesFee && matchesRating;
   });
 
+  const clearFilters = () => {
+    setSelectedLocation("all");
+    setSelectedCourse("all");
+    setFeeRange([0, 100000]);
+    setMinRating(0);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
         <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-              Find Your Perfect
-              <span className="block text-yellow-400">College Match</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in">
+              Find Your Dream
+              <span className="block text-yellow-400">College Today</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto animate-fade-in">
-              Discover top universities and colleges that match your goals, budget, and dreams. 
-              Start your journey to academic excellence today.
+              Discover top universities that match your goals, budget, and dreams. 
+              Apply directly and start your journey to academic excellence.
             </p>
             
             {/* Search Bar */}
-            <div className="max-w-4xl mx-auto mb-8 animate-fade-in">
-              <div className="flex flex-col md:flex-row gap-4 bg-white rounded-2xl p-6 shadow-2xl">
+            <div className="max-w-3xl mx-auto mb-8 animate-fade-in">
+              <div className="flex flex-col md:flex-row gap-4 bg-white rounded-2xl p-4 shadow-2xl">
                 <div className="flex-1 relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <Input
                     type="text"
-                    placeholder="Search for colleges, courses, or locations..."
+                    placeholder="Search colleges, courses, or locations..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 h-14 text-lg border-0 focus:ring-2 focus:ring-blue-500"
+                    className="pl-12 h-12 text-lg border-0 focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <Button 
                   size="lg" 
-                  className="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                  className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                   onClick={() => document.getElementById('colleges')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Find Colleges
@@ -166,268 +167,97 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Filters Section */}
-      <section className="bg-white border-b shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col lg:flex-row gap-4 items-center">
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden w-full"
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              Filters ({filteredColleges.length} results)
-            </Button>
-            
-            <div className={`${showFilters ? 'block' : 'hidden'} lg:flex flex-1 gap-4 w-full`}>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="Cambridge">Cambridge</SelectItem>
-                  <SelectItem value="Stanford">Stanford</SelectItem>
-                  <SelectItem value="Boston">Boston</SelectItem>
-                </SelectContent>
-              </Select>
+      {/* Mobile Filter Toggle */}
+      <div className="lg:hidden bg-white border-b px-4 py-3 sticky top-0 z-20">
+        <Button
+          variant="outline"
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <Filter className="h-4 w-4" />
+          Filters ({filteredColleges.length} results)
+        </Button>
+      </div>
 
-              <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Course" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Courses</SelectItem>
-                  <SelectItem value="Computer Science">Computer Science</SelectItem>
-                  <SelectItem value="Engineering">Engineering</SelectItem>
-                  <SelectItem value="Business">Business</SelectItem>
-                  <SelectItem value="Medicine">Medicine</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="flex-1 min-w-48">
-                <div className="text-sm text-gray-600 mb-2">
-                  Fee Range: ${feeRange[0].toLocaleString()} - ${feeRange[1].toLocaleString()}
-                </div>
-                <Slider
-                  value={feeRange}
-                  onValueChange={setFeeRange}
-                  max={100000}
-                  min={0}
-                  step={5000}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="w-full lg:w-32">
-                <div className="text-sm text-gray-600 mb-2">Min Rating: {minRating}</div>
-                <Slider
-                  value={[minRating]}
-                  onValueChange={(value) => setMinRating(value[0])}
-                  max={5}
-                  min={0}
-                  step={0.1}
-                  className="w-full"
-                />
-              </div>
-            </div>
-
-            <div className="text-sm text-gray-600 font-medium">
-              {filteredColleges.length} colleges found
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Colleges Grid */}
-      <section id="colleges" className="py-12">
+      {/* Main Content */}
+      <section id="colleges" className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredColleges.map((college) => (
-              <Card key={college.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <CardHeader className="p-0 relative">
-                  <img 
-                    src={college.image} 
-                    alt={college.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-semibold">{college.rating}</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <img 
-                      src={college.logo} 
-                      alt={`${college.name} logo`}
-                      className="w-12 h-12 rounded-lg object-cover"
-                    />
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">{college.name}</h3>
-                      <div className="flex items-center text-gray-600 text-sm">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        {college.location}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Annual Fee</span>
-                      <span className="font-semibold text-green-600">{college.feeRange}</span>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2">
-                      {college.courses.slice(0, 3).map((course) => (
-                        <Badge key={course} variant="secondary" className="text-xs">
-                          {course}
-                        </Badge>
-                      ))}
-                      {college.courses.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{college.courses.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-
-                <CardFooter className="p-6 pt-0">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                        More Info
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center gap-4">
-                          <img 
-                            src={college.logo} 
-                            alt={`${college.name} logo`}
-                            className="w-12 h-12 rounded-lg object-cover"
-                          />
-                          <div>
-                            <div className="text-2xl font-bold">{college.name}</div>
-                            <div className="text-sm text-gray-600 flex items-center">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              {college.location}
-                            </div>
-                          </div>
-                        </DialogTitle>
-                      </DialogHeader>
-
-                      <div className="mt-6">
-                        <img 
-                          src={college.image} 
-                          alt={college.name}
-                          className="w-full h-64 object-cover rounded-lg mb-6"
-                        />
-
-                        <Tabs defaultValue="overview" className="w-full">
-                          <TabsList className="grid w-full grid-cols-4">
-                            <TabsTrigger value="overview">Overview</TabsTrigger>
-                            <TabsTrigger value="courses">Courses</TabsTrigger>
-                            <TabsTrigger value="admissions">Admissions</TabsTrigger>
-                            <TabsTrigger value="contact">Contact</TabsTrigger>
-                          </TabsList>
-
-                          <TabsContent value="overview" className="space-y-6">
-                            <div>
-                              <h3 className="text-lg font-semibold mb-3">About the College</h3>
-                              <p className="text-gray-700 leading-relaxed">{college.description}</p>
-                            </div>
-
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                                <Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                                <div className="font-semibold text-gray-900">{college.totalStudents}</div>
-                                <div className="text-sm text-gray-600">Total Students</div>
-                              </div>
-                              <div className="text-center p-4 bg-green-50 rounded-lg">
-                                <Award className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                                <div className="font-semibold text-gray-900">{college.placementRate}</div>
-                                <div className="text-sm text-gray-600">Placement Rate</div>
-                              </div>
-                              <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                                <DollarSign className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-                                <div className="font-semibold text-gray-900">{college.averageSalary}</div>
-                                <div className="text-sm text-gray-600">Avg. Salary</div>
-                              </div>
-                              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                                <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                                <div className="font-semibold text-gray-900">{college.established}</div>
-                                <div className="text-sm text-gray-600">Established</div>
-                              </div>
-                            </div>
-                          </TabsContent>
-
-                          <TabsContent value="courses" className="space-y-4">
-                            <h3 className="text-lg font-semibold">Courses Offered</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {college.courses.map((course) => (
-                                <div key={course} className="p-4 border rounded-lg hover:bg-gray-50">
-                                  <div className="font-medium text-gray-900">{course}</div>
-                                </div>
-                              ))}
-                            </div>
-                          </TabsContent>
-
-                          <TabsContent value="admissions" className="space-y-4">
-                            <div>
-                              <h3 className="text-lg font-semibold mb-3">Eligibility Criteria</h3>
-                              <p className="text-gray-700">{college.eligibility}</p>
-                            </div>
-                            <Separator />
-                            <div>
-                              <h3 className="text-lg font-semibold mb-3">Fee Structure</h3>
-                              <div className="p-4 bg-green-50 rounded-lg">
-                                <div className="font-semibold text-green-800">Annual Fee Range</div>
-                                <div className="text-2xl font-bold text-green-600">{college.feeRange}</div>
-                              </div>
-                            </div>
-                          </TabsContent>
-
-                          <TabsContent value="contact" className="space-y-4">
-                            <h3 className="text-lg font-semibold">Contact Information</h3>
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-3">
-                                <Phone className="h-5 w-5 text-blue-600" />
-                                <span>{college.contact.phone}</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <Mail className="h-5 w-5 text-blue-600" />
-                                <span>{college.contact.email}</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <Globe className="h-5 w-5 text-blue-600" />
-                                <span>{college.contact.website}</span>
-                              </div>
-                            </div>
-                            <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                              Apply Now
-                            </Button>
-                          </TabsContent>
-                        </Tabs>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-
-          {filteredColleges.length === 0 && (
-            <div className="text-center py-16">
-              <div className="text-gray-400 text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No colleges found</h3>
-              <p className="text-gray-600">Try adjusting your search criteria or filters</p>
+          <div className="flex gap-8">
+            {/* Desktop Sidebar */}
+            <div className="hidden lg:block w-80 flex-shrink-0">
+              <FilterSidebar
+                selectedLocation={selectedLocation}
+                onLocationChange={setSelectedLocation}
+                selectedCourse={selectedCourse}
+                onCourseChange={setSelectedCourse}
+                feeRange={feeRange}
+                onFeeRangeChange={setFeeRange}
+                minRating={minRating}
+                onRatingChange={setMinRating}
+                resultsCount={filteredColleges.length}
+                onClearFilters={clearFilters}
+              />
             </div>
-          )}
+
+            {/* Mobile Filters */}
+            {showMobileFilters && (
+              <div className="lg:hidden fixed inset-0 z-30 bg-black bg-opacity-50">
+                <div className="bg-white w-80 h-full overflow-y-auto p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold">Filters</h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowMobileFilters(false)}
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  <FilterSidebar
+                    selectedLocation={selectedLocation}
+                    onLocationChange={setSelectedLocation}
+                    selectedCourse={selectedCourse}
+                    onCourseChange={setSelectedCourse}
+                    feeRange={feeRange}
+                    onFeeRangeChange={setFeeRange}
+                    minRating={minRating}
+                    onRatingChange={setMinRating}
+                    resultsCount={filteredColleges.length}
+                    onClearFilters={clearFilters}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* College Cards */}
+            <div className="flex-1">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {filteredColleges.length} Colleges Found
+                </h2>
+                <p className="text-gray-600">
+                  Discover the perfect college for your academic journey
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {filteredColleges.map((college) => (
+                  <CollegeCard key={college.id} college={college} />
+                ))}
+              </div>
+
+              {filteredColleges.length === 0 && (
+                <div className="text-center py-16">
+                  <div className="text-gray-400 text-6xl mb-4">🔍</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No colleges found</h3>
+                  <p className="text-gray-600 mb-4">Try adjusting your search criteria or filters</p>
+                  <Button onClick={clearFilters} variant="outline">
+                    Clear All Filters
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
