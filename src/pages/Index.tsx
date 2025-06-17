@@ -89,18 +89,32 @@ const Index = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const filteredColleges = colleges.filter(college => {
-    const matchesSearch = college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         college.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = searchTerm === "" || 
+                         college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         college.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         college.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         college.courses.some(course => course.toLowerCase().includes(searchTerm.toLowerCase()));
+    
     const matchesLocation = selectedLocation === "all" || college.location.includes(selectedLocation);
     const matchesCourse = selectedCourse === "all" || college.courses.some(course => 
       course.toLowerCase().includes(selectedCourse.toLowerCase()));
     const matchesFee = college.feeMin >= feeRange[0] && college.feeMax <= feeRange[1];
     const matchesRating = college.rating >= minRating;
 
+    console.log('Filtering college:', college.name, {
+      searchTerm,
+      matchesSearch,
+      matchesLocation,
+      matchesCourse,
+      matchesFee,
+      matchesRating
+    });
+
     return matchesSearch && matchesLocation && matchesCourse && matchesFee && matchesRating;
   });
 
   const clearFilters = () => {
+    setSearchTerm("");
     setSelectedLocation("all");
     setSelectedCourse("all");
     setFeeRange([0, 100000]);
