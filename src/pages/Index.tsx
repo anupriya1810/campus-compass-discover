@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Filter, Phone, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -445,7 +446,7 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [selectedCourse, setSelectedCourse] = useState("all");
-  const [feeRange, setFeeRange] = useState([0, 100000]);
+  const [feeRange, setFeeRange] = useState([0, 1000000]); // Increased from 100000 to 1000000
   const [minRating, setMinRating] = useState(0);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -478,7 +479,7 @@ const Index = () => {
     setSearchTerm("");
     setSelectedLocation("all");
     setSelectedCourse("all");
-    setFeeRange([0, 100000]);
+    setFeeRange([0, 1000000]); // Updated to match the new default
     setMinRating(0);
   };
 
