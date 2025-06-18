@@ -69,6 +69,14 @@ export const FilterSidebar = ({
               <SelectItem value="Boston">Boston, MA</SelectItem>
               <SelectItem value="New York">New York, NY</SelectItem>
               <SelectItem value="Chicago">Chicago, IL</SelectItem>
+              <SelectItem value="London">London, UK</SelectItem>
+              <SelectItem value="Mumbai">Mumbai, India</SelectItem>
+              <SelectItem value="Delhi">Delhi, India</SelectItem>
+              <SelectItem value="Bangalore">Bangalore, India</SelectItem>
+              <SelectItem value="Chennai">Chennai, India</SelectItem>
+              <SelectItem value="Melbourne">Melbourne, Australia</SelectItem>
+              <SelectItem value="Sydney">Sydney, Australia</SelectItem>
+              <SelectItem value="Tokyo">Tokyo, Japan</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -91,6 +99,8 @@ export const FilterSidebar = ({
               <SelectItem value="Medicine">Medicine</SelectItem>
               <SelectItem value="Law">Law</SelectItem>
               <SelectItem value="Arts">Liberal Arts</SelectItem>
+              <SelectItem value="Economics">Economics</SelectItem>
+              <SelectItem value="Commerce">Commerce</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -99,20 +109,20 @@ export const FilterSidebar = ({
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-yellow-600" />
-            <label className="text-sm font-medium">Annual Fee Range</label>
+            <label className="text-sm font-medium">Annual Fee Range (INR)</label>
           </div>
           <div className="px-2">
             <Slider
               value={feeRange}
               onValueChange={onFeeRangeChange}
-              max={100000}
+              max={10000000}
               min={0}
-              step={5000}
+              step={50000}
               className="w-full"
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>${feeRange[0].toLocaleString()}</span>
-              <span>${feeRange[1].toLocaleString()}</span>
+              <span>₹{(feeRange[0] / 100000).toFixed(1)}L</span>
+              <span>₹{(feeRange[1] / 100000).toFixed(1)}L</span>
             </div>
           </div>
         </div>
