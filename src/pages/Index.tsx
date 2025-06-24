@@ -1,11 +1,15 @@
-
-import { useState } from "react";
-import { Search, Filter, Phone, Mail, MapPin } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search, TrendingUp, Users, Award, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { FilterSidebar } from "@/components/FilterSidebar";
 import { CollegeCard } from "@/components/CollegeCard";
+import { HeroSection } from "@/components/HeroSection";
+import { PopularColleges } from "@/components/PopularColleges";
+import { StudentTestimonials } from "@/components/StudentTestimonials";
+import { QuickStats } from "@/components/QuickStats";
 
 // Comprehensive college data for India & Abroad (All prices in INR)
 const colleges = [
@@ -937,7 +941,7 @@ const colleges = [
   }
 ];
 
-const Index = () => {
+export default function Index() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [selectedCourse, setSelectedCourse] = useState("all");
@@ -945,30 +949,20 @@ const Index = () => {
   const [minRating, setMinRating] = useState(0);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const filteredColleges = colleges.filter(college => {
-    const matchesSearch = searchTerm === "" || 
-                         college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         college.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         college.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         college.courses.some(course => course.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesLocation = selectedLocation === "all" || college.location.includes(selectedLocation);
-    const matchesCourse = selectedCourse === "all" || college.courses.some(course => 
-      course.toLowerCase().includes(selectedCourse.toLowerCase()));
-    const matchesFee = college.feeMin >= feeRange[0] && college.feeMax <= feeRange[1];
-    const matchesRating = college.rating >= minRating;
+  const filteredColleges = useMemo(() => {
+    return colleges.filter((college) => {
+      const matchesSearch = college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          college.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          college.courses.some(course => course.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesLocation = selectedLocation === "all" || college.location.includes(selectedLocation);
+      const matchesCourse = selectedCourse === "all" || college.courses.includes(selectedCourse);
+      const matchesFee = college.feeMin <= feeRange[1] && college.feeMax >= feeRange[0];
+      const matchesRating = college.rating >= minRating;
 
-    console.log('Filtering college:', college.name, {
-      searchTerm,
-      matchesSearch,
-      matchesLocation,
-      matchesCourse,
-      matchesFee,
-      matchesRating
+      return matchesSearch && matchesLocation && matchesCourse && matchesFee && matchesRating;
     });
-
-    return matchesSearch && matchesLocation && matchesCourse && matchesFee && matchesRating;
-  });
+  }, [searchTerm, selectedLocation, selectedCourse, feeRange, minRating]);
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -979,85 +973,88 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in">
-              Find Your Dream
-              <span className="block text-yellow-400">College Today</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto animate-fade-in">
-              Discover top universities worldwide that match your goals, budget, and dreams. 
-              Apply directly and start your journey to academic excellence.
-            </p>
-            
-            {/* Search Bar */}
-            <div className="max-w-3xl mx-auto mb-8 animate-fade-in">
-              <div className="flex flex-col md:flex-row gap-4 bg-white rounded-2xl p-4 shadow-2xl">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <Input
-                    type="text"
-                    placeholder="Search colleges, courses, or locations..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 h-12 text-lg border-0 focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <Button 
-                  size="lg" 
-                  className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                  onClick={() => document.getElementById('colleges')?.scrollIntoView({ behavior: 'smooth' })}
+      <HeroSection searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+      
+      {/* Quick Stats */}
+      <QuickStats />
+      
+      {/* Popular Colleges */}
+      <PopularColleges colleges={colleges.slice(0, 6)} />
+      
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex gap-8">
+          {/* Desktop Sidebar */}
+          <div className="hidden lg:block w-80 flex-shrink-0">
+            <FilterSidebar
+              selectedLocation={selectedLocation}
+              onLocationChange={setSelectedLocation}
+              selectedCourse={selectedCourse}
+              onCourseChange={setSelectedCourse}
+              feeRange={feeRange}
+              onFeeRangeChange={setFeeRange}
+              minRating={minRating}
+              onRatingChange={setMinRating}
+              resultsCount={filteredColleges.length}
+              onClearFilters={clearFilters}
+            />
+          </div>
+
+          {/* College Grid */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                All Colleges ({filteredColleges.length})
+              </h2>
+              <Button
+                variant="outline"
+                onClick={() => setShowMobileFilters(true)}
+                className="lg:hidden"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
+            </div>
+
+            {filteredColleges.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredColleges.map((college) => (
+                  <CollegeCard key={college.id} college={college} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="text-gray-500 text-lg">No colleges found matching your criteria</div>
+                <Button onClick={clearFilters} className="mt-4">
+                  Clear Filters
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Student Testimonials */}
+      <StudentTestimonials />
+
+      {/* Mobile Filters Modal */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden">
+          <div className="bg-white h-full overflow-y-auto">
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Filters</h3>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowMobileFilters(false)}
                 >
-                  Find Colleges
+                  ✕
                 </Button>
               </div>
             </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400">50+</div>
-                <div className="text-blue-100">Colleges Listed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400">95%</div>
-                <div className="text-blue-100">Success Rate</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400">50K+</div>
-                <div className="text-blue-100">Students Helped</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400">24/7</div>
-                <div className="text-blue-100">Support</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mobile Filter Toggle */}
-      <div className="lg:hidden bg-white border-b px-4 py-3 sticky top-0 z-20">
-        <Button
-          variant="outline"
-          onClick={() => setShowMobileFilters(!showMobileFilters)}
-          className="w-full flex items-center justify-center gap-2"
-        >
-          <Filter className="h-4 w-4" />
-          Filters ({filteredColleges.length} results)
-        </Button>
-      </div>
-
-      {/* Main Content */}
-      <section id="colleges" className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-8">
-            {/* Desktop Sidebar */}
-            <div className="hidden lg:block w-80 flex-shrink-0">
+            <div className="p-4">
               <FilterSidebar
                 selectedLocation={selectedLocation}
                 onLocationChange={setSelectedLocation}
@@ -1070,139 +1067,16 @@ const Index = () => {
                 resultsCount={filteredColleges.length}
                 onClearFilters={clearFilters}
               />
-            </div>
-
-            {/* Mobile Filters */}
-            {showMobileFilters && (
-              <div className="lg:hidden fixed inset-0 z-30 bg-black bg-opacity-50">
-                <div className="bg-white w-80 h-full overflow-y-auto p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold">Filters</h2>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowMobileFilters(false)}
-                    >
-                      ✕
-                    </Button>
-                  </div>
-                  <FilterSidebar
-                    selectedLocation={selectedLocation}
-                    onLocationChange={setSelectedLocation}
-                    selectedCourse={selectedCourse}
-                    onCourseChange={setSelectedCourse}
-                    feeRange={feeRange}
-                    onFeeRangeChange={setFeeRange}
-                    minRating={minRating}
-                    onRatingChange={setMinRating}
-                    resultsCount={filteredColleges.length}
-                    onClearFilters={clearFilters}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* College Cards */}
-            <div className="flex-1">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {filteredColleges.length} Colleges Found
-                </h2>
-                <p className="text-gray-600">
-                  Discover the perfect college for your academic journey worldwide
-                </p>
-              </div>
-
-              <div className="space-y-6">
-                {filteredColleges.map((college) => (
-                  <CollegeCard key={college.id} college={college} />
-                ))}
-              </div>
-
-              {filteredColleges.length === 0 && (
-                <div className="text-center py-16">
-                  <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No colleges found</h3>
-                  <p className="text-gray-600 mb-4">Try adjusting your search criteria or filters</p>
-                  <Button onClick={clearFilters} variant="outline">
-                    Clear All Filters
-                  </Button>
-                </div>
-              )}
+              <Button
+                className="w-full mt-4"
+                onClick={() => setShowMobileFilters(false)}
+              >
+                Apply Filters
+              </Button>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* About Us Section */}
-      <section className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2">
-              <h2 className="text-3xl font-bold mb-6">About Campus Compass</h2>
-              <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                Campus Compass is your trusted partner in finding the perfect college for your academic journey worldwide. 
-                We've helped over 50,000 students discover institutions that match their goals, budget, and aspirations.
-              </p>
-              <p className="text-gray-300 leading-relaxed mb-8">
-                Our comprehensive database includes detailed information about colleges from India, UK, USA, Australia, Japan and more. 
-                From IITs to Ivy League universities, we cover courses, fees, placement records, and everything you need for an informed decision.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-400 mb-2">50+</div>
-                  <div className="text-gray-300">Partner Colleges</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-400 mb-2">50K+</div>
-                  <div className="text-gray-300">Students Placed</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-400 mb-2">95%</div>
-                  <div className="text-gray-300">Success Rate</div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-6">Contact Information</h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-blue-400" />
-                  <span>+1-800-CAMPUS (226-787)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-blue-400" />
-                  <span>info@campuscompass.com</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-blue-400" />
-                  <span>123 Education Street, Learning City, LC 12345</span>
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <h4 className="font-semibold mb-4">Quick Links</h4>
-                <div className="space-y-2">
-                  <a href="#" className="block text-gray-300 hover:text-white transition-colors">Privacy Policy</a>
-                  <a href="#" className="block text-gray-300 hover:text-white transition-colors">Terms of Service</a>
-                  <a href="#" className="block text-gray-300 hover:text-white transition-colors">FAQ</a>
-                  <a href="#" className="block text-gray-300 hover:text-white transition-colors">Support</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Separator className="my-8 bg-gray-700" />
-          
-          <div className="text-center text-gray-400">
-            <p>&copy; 2024 Campus Compass. All rights reserved. Helping students find their perfect college match worldwide.</p>
-          </div>
-        </div>
-      </section>
+      )}
     </div>
   );
-};
-
-export default Index;
+}
