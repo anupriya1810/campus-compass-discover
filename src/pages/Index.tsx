@@ -10,6 +10,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { PopularColleges } from "@/components/PopularColleges";
 import { StudentTestimonials } from "@/components/StudentTestimonials";
 import { QuickStats } from "@/components/QuickStats";
+import { AboutUs } from "@/components/AboutUs";
 
 // Comprehensive college data for India & Abroad (All prices in INR)
 const colleges = [
@@ -1038,6 +1039,9 @@ export default function Index() {
 
       {/* Student Testimonials */}
       <StudentTestimonials />
+
+      {/* About Us */}
+      <AboutUs />
 
       {/* Mobile Filters Modal */}
       {showMobileFilters && (
